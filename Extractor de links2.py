@@ -2,18 +2,26 @@ import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from datetime import datetime
 
 
 # Inicializar el navegador
 driver = webdriver.Chrome()
 
+# Obtener la fecha y hora actual para guardar el dataframe con la fecha que se extrajo
+now = datetime.now()
+
+# Formato de le fecha y hora
+timestamp = now.strftime("%Y-%m-%d_%H-%M")
+
+# Nombre con el que se guardará el dataframe
+nombre_df = f"Enlaces{timestamp}.csv"
+
 '''
 Actualmente mercado Libre no permite realizar búsquedas mediante el webdriver, es por eso que
-link de la búsqueda se debe agregar manualmente. Este link basta con copiarlo y te mostrará 50 productos
+link de la búsqueda se debe agregar manualmente. Este link basta con copiarlo y te mostrará 54 productos
 '''
-# Revisar la cantidad de productos que muestra por link de búsqueda
 # URL de búsqueda
 url = "https://listado.mercadolibre.com.mx/adornos-y-decoraci%C3%B3n-del-hogar#D[A:Adornos%20y%20Decoraci%C3%B3n%20del%20Hogar]"
 
@@ -24,88 +32,107 @@ driver.get(url)
 time.sleep(1)
 
 # Lista para almacenar los links
-links = []  
+links = []
+
+'''
+Este while se utiliza para validar si aun se encuentra el botón de "Siguiente" Si existe continua
+dando click para ir a la siguiente pagina, ¿Cuántas paginas son?
+'''
 while True:
 
-    # Obtener el tamaño de la ventana del navegador
-    window_size = driver.get_window_size()
-    window_height = window_size["height"]
+    '''
+    Obtiene el tamaño de la ventana en un diccionario con dos datos width y height
+    '''
+    # Realiza Scroll hacia abajo para cargar todos los elementos
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
 
-    while True:
-        # Scroll hacia abajo
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-        time.sleep(1)  # Esperar a que se carguen más elementos
+    # Espera a que carguen todos los elementos
+    time.sleep(1)
+
+    # Encuentra todos los elementos que tengan la clase ui-search-layout__item
+    '''
+    Elementos de búsqueda
+    Busca únicamente los elementos de la búsqueda, ya que en la página por lo natural hay mas enlaces 
+    que no pertenecen necesariamente a la búsqueda, sino a recomendaciones
+    de mercado libre.
+    '''
+    elemento_busqueda = driver.find_elements(By.CLASS_NAME, 'ui-search-layout__item')
+     
+    #Bucle para extraer los datos en cada enlace
+    for i in elemento_busqueda:
         
-        # Obtener posición actual del scroll
-        current_scroll = driver.execute_script("return window.scrollY")
-        
-        # Si no hay más desplazamiento posible, salir del bucle
-        if current_scroll + window_height >= driver.execute_script("return document.body.scrollHeight"):
-            break
+        '''
+        Titulo
+        '''  
+        #Para cada elemento i en enlaces encuentra el titulo que contenga la clase ui-search-item__group__element.ui-search-link__title-card.ui-search-link
+        titulo_element = i.find_element(By.CLASS_NAME, 'ui-search-item__title')
+        # Extrae el título de la variable y lo convierte a texto
+        titulo = titulo_element.text
 
-    # Busqueda de enlaces en el listado ol
-    enlaces = driver.find_elements(By.XPATH, '//*[@id="root-app"]/div/div[2]/section/ol/li')
-
-    #Buble para encontrar todos los li
-    for i, element_article in enumerate(enlaces, start=1):
-
-        #Titulo
-        xpath_titulos = [f'/html/body/main/div/div[2]/section/ol/li[{i}]/div/div/div[2]/div[1]/a/h2', f'/html/body/main/div/div[2]/section/ol/li[{i}]/div/div/div[2]/div[2]/a/h2']
-        for i, xpath_template in enumerate(xpath_titulos, start=1):
-            try:
-                xpath_titulo = xpath_template.format(i)
-                elemento_titulo = driver.find_element(By.XPATH, xpath_titulo)
-                print("titulo", i)
-                break
-            except NoSuchElementException:
-                print("No encontre el titulo", i)
-                continue
-        titulo = elemento_titulo.text
-        #ID
+        '''
+        ID
+        '''
+        #Divide el titulo por palabras en una lista
         words = titulo.split()
+        # Toma la primera letra de cada palabra y la une para formar el ID
+        # [word[0] for word in words] -  Crea una lista con el primer carácter de cada palabra
+        # ''.join - concatena (Une) el carácter y el '' evita que no tenga ningún espacio entre cada uno.
         id = ''.join([word[0] for word in words])
-        print("El id es: " + id)        
 
+        '''
+        Enlace
+        '''
+        # Extrae el link de la variable en un enlace tipo href
+        enlace_element = i.find_element(By.TAG_NAME, 'a')
+        enlace = enlace_element.get_attribute('href')
 
-        #Link:
-        xpaths_links = [f'/html/body/main/div/div[2]/section/ol/li[{i}]/div/div/div[2]/div[1]/a', f'/html/body/main/div/div[2]/section/ol/li[{i}]/div/div/div[2]/div[2]/a']
-        for i, xpath_template in enumerate(xpaths_links, start=1):
-            try:
-                xpath_link = xpath_template.format(i)
-                elemento_link = driver.find_element(By.XPATH, xpath_link)
-                enlace_href = elemento_link.get_attribute('href')
-                print("link", i)
-                break
-            except NoSuchElementException:
-                print("No encontre el link", i)
-                continue
-
-
-        # Agregar los datos a la lista
+        '''
+        Agregar los elementos a la lista Links
+        '''
         links.append({
             'ID': id,
             'Titulo': titulo,
-            'Enlace': enlace_href
+            'Enlace': enlace
         })
+    '''
+    Botón siguiente:
+    Ya que termina de extraer los datos de la búsqueda revisa si existe el botón "Siguiente" si está
+    le da click, si no termina el programa
+    '''
+    
+    
+    # Intenta encontrar el botón siguiente y si existe le da click
+    # Variable de control
+    primera_vez = True
+
     try:
-        xpath_siguientes = ['/html/body/main/div/div[2]/section/div[9]/nav/li[3]/a', '/html/body/main/div/div[2]/section/div[9]/nav/li[4]/a']
-        for i, xpath_template in enumerate(xpath_siguientes, start=1):
-            try:
-                boton_siguiente = driver.find_element(By.XPATH, xpath_template)
-                boton_siguiente.click()
-                break
-            except NoSuchElementException:
-                print("No encontre el boton siguiente", i)
-                continue
-    except:
-        print("No se encontró el botón 'Siguiente' o ha finalizado la paginación.")
+        while primera_vez == True:
+            try:  
+                div_boton_siguiente = driver.find_element(By.CLASS_NAME, "ui-search-pagination")
+                list_boton_siguiente = div_boton_siguiente.find_element(By.TAG_NAME, 'a')
+                list_boton_siguiente.click()
+                primera_vez = False
+            except Exception as e:
+                if primera_vez == False:
+                    # Encuentra el div que contiene el botón siguiente
+                    div_boton_siguiente = driver.find_element(By.CLASS_NAME, "ui-search-pagination")
+                    # Extrae la lista de elementos que tengan el tag a
+                    list_boton_siguiente = div_boton_siguiente.find_elements(By.TAG_NAME, 'a')
+                    # da click al elemento 2
+                    list_boton_siguiente[1].click()
+    except Exception:
         break
 
+
+'''
+Guardar los datos
+'''
 # Crear un DataFrame a partir de la lista de datos
 df = pd.DataFrame(links)
 
-# Guardar el DataFrame como un archivo CSV
-df.to_csv('datos2.csv', index=False)  # Cambia el nombre del archivo si lo deseas
+# Guarda el DataFrame como un archivo CSV
+df.to_csv(f'Links/{nombre_df}', index=False)
 
 # Cerrar el controlador de Selenium
 driver.quit()
+
