@@ -1,0 +1,18 @@
+1695646530939	geckodriver	INFO	Listening on 127.0.0.1:57645
+1695646533987	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "--remote-debugging-port" "57646" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "C:\\Users\\el_da\\AppData\\Local\\Temp\\rust_mozprofilefnFoR7"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1695646534188	Marionette	INFO	Marionette enabled
+Dynamically enable window occlusion 0
+1695646534255	Marionette	INFO	Listening on port 57660
+WebDriver BiDi listening on ws://127.0.0.1:57646
+Read port: 57660
+1695646534409	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+DevTools listening on ws://127.0.0.1:57646/devtools/browser/cf0108e6-cf1a-4373-b74a-7d8fd6c93b93
+JavaScript warning: https://ob.segreencolumn.com/i/6894708c2787b2d1beb3b8ba1add8ad1.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript error: resource://gre/modules/XULStore.sys.mjs, line 60: Error: Can't find profile directory.
+1695646552654	Marionette	INFO	Stopped listening on port 57660
+JavaScript warning: https://articulo.mercadolibre.com.mx/MLM-1736214830-reloj-despertador-digital-bocina-bluetooth-y-radio-fm-_JM#position=36&search_layout=stack&type=item&tracking_id=1cbc3388-8392-492f-b3c7-77af934c4b35, line 5: Script terminated by timeout at:
+nrWrapper@https://articulo.mercadolibre.com.mx/MLM-1736214830-reloj-despertador-digital-bocina-bluetooth-y-radio-fm-_JM#position=36&search_layout=stack&type=item&tracking_id=1cbc3388-8392-492f-b3c7-77af934c4b35:5:14806
+
+Dynamically enable window occlusion 1
