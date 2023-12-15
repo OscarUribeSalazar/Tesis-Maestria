@@ -106,21 +106,14 @@ while True:
     primera_vez = True
 
     try:
-        while primera_vez == True:
-            try:  
-                div_boton_siguiente = driver.find_element(By.CLASS_NAME, "ui-search-pagination")
-                list_boton_siguiente = div_boton_siguiente.find_element(By.TAG_NAME, 'a')
-                list_boton_siguiente.click()
-                primera_vez = False
-            except Exception as e:
-                if primera_vez == False:
-                    # Encuentra el div que contiene el botón siguiente
-                    div_boton_siguiente = driver.find_element(By.CLASS_NAME, "ui-search-pagination")
-                    # Extrae la lista de elementos que tengan el tag a
-                    list_boton_siguiente = div_boton_siguiente.find_elements(By.TAG_NAME, 'a')
-                    # da click al elemento 2
-                    list_boton_siguiente[1].click()
-    except Exception:
+        div_boton_siguiente = driver.find_element(By.CLASS_NAME, "ui-search-pagination")
+        list_boton_siguiente = div_boton_siguiente.find_elements(By.TAG_NAME, 'a')
+        if "Siguiente" in list_boton_siguiente[-1].text:
+            list_boton_siguiente[-1].click()
+        else:
+            break
+    except Exception as e:
+        print("No se puede navegar:", e)
         break
 
 
