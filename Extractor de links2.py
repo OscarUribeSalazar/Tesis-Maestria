@@ -133,6 +133,6 @@ df = pd.DataFrame(links)
 # Guarda el DataFrame como un archivo CSV
 df.to_csv(f'Links/{nombre_df}', index=False)
 
-# Cerrar el controlador de Selenium
+# Cerrar el controlador de Selenium 
 driver.quit()
 
