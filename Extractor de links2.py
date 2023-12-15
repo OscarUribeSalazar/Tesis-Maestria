@@ -45,7 +45,6 @@ while True:
     '''
     # Realiza Scroll hacia abajo para cargar todos los elementos
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-    time.sleep(1)
 
     # Espera a que carguen todos los elementos
     time.sleep(1)
