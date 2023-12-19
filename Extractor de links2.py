@@ -2,7 +2,6 @@ import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
-from selenium.common.exceptions import NoSuchElementException
 from datetime import datetime
 
 
@@ -106,13 +105,18 @@ while True:
     primera_vez = True
 
     try:
+        # Encuentra el div que contiene los botones
         div_boton_siguiente = driver.find_element(By.CLASS_NAME, "ui-search-pagination")
+        # Encuentra los elementos "a"
         list_boton_siguiente = div_boton_siguiente.find_elements(By.TAG_NAME, 'a')
+        # De la lista de elementos verifica que el ultimo elemento sea el botón "Siguiente"
         if "Siguiente" in list_boton_siguiente[-1].text:
+            # Da click al botón
             list_boton_siguiente[-1].click()
         else:
             break
     except Exception as e:
+        # Si no encuentra el botón siguiente se rompe
         print("No se puede navegar:", e)
         break
 
