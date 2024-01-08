@@ -156,6 +156,7 @@ for enlace in datos['Enlace'][200:300]:
             # Agregar el diccionario de info del producto a la lista
             info_list.append(product_info)
             
+            
             success = True
             time.sleep(2)
         except:
