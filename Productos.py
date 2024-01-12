@@ -3,6 +3,9 @@ import pandas as pd
 import time
 from datetime import datetime
 
+# https://auth.mercadolibre.com.mx/authorization?response_type=code&client_id=7740131767656174&redirect_uri=https://reypi.com.br
+app = 'APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
+
 id_categoria = 'MLM455214'
 
 # Obtener la fecha y hora actual para guardar el dataframe con la fecha que se extrajo
@@ -17,12 +20,12 @@ url = f"https://api.mercadolibre.com/sites/MLM/search?limit={limit}&category={id
 
 payload = {}
 headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011120-c400ce882e4471129b76ab486f0d2ac9-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
 }
 
 response = requests.request("GET", url, headers=headers, data=payload, timeout=50)
 data = response.json()
-num_resultados = 3960
+num_resultados = 3950
 
 info_categoria = []
 
@@ -49,8 +52,9 @@ for j in range(0, num_resultados, 50):
         break  # Rompe el bucle si no hay más reseñas
 
     for i in range(resultados):
-        elemento = data['results'][1]
+        elemento = data['results'][i]
         id = elemento['id']
+        print(id)
 
         #Agregar los datos al Dataframe
         info_categoria.append({
