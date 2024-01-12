@@ -2,6 +2,8 @@ import pandas as pd
 import requests
 import time
 from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
 # https://auth.mercadolibre.com.mx/authorization?response_type=code&client_id=7740131767656174&redirect_uri=https://reypi.com.br
 app = 'APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
@@ -17,7 +19,7 @@ nombre_archivo_csv = f"Info_Productos_{timestamp}.csv"
 
 info_producto = []
 
-for id_producto in df['ID'][15:20]:
+for id_producto in df['ID'][:50]:
     print(id_producto)
 
     url = f"https://api.mercadolibre.com/items/{id_producto}"
@@ -68,32 +70,6 @@ for id_producto in df['ID'][15:20]:
 
     catalogo_id = data['catalog_product_id']
 
-    url = f"https://api.mercadolibre.com/products/{catalogo_id}"
-
-    payload = {}
-    headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011210-65ca92db279766a1f3eb40016c312430-17228348'
-    }
-
-    max_attempts = 3
-    for attempt in range(max_attempts):
-        try:
-            response3 = requests.request("GET", url, headers=headers, data=payload, timeout=10)
-            response3.raise_for_status()  # Lanzará una excepción si la solicitud no fue exitosa (código de estado diferente de 2xx)
-            catalago_id = response3.json()
-            break
-        except requests.exceptions.RequestException as e:
-            print(f"Intento {attempt + 1} fallido. Razón: {str(e)}")
-        if attempt < max_attempts - 1:
-            print("Reintentando en 5 segundos...")
-            time.sleep(5)  # Espera 5 segundos antes de intentar nuevamente
-        else:
-            print("Número máximo de intentos alcanzado. La solicitud no se pudo completar.")
-
-    
-    ventas2 = catalago_id['sold_quantity']
-    print(ventas2)
-
     id = data['id']
     title = data['title']
     seller_id = data['seller_id']
@@ -111,6 +87,42 @@ for id_producto in df['ID'][15:20]:
         value_name = atributo['value_name']
         lista_atributos.append({"":[name, value_name]})
     salud = data['health']
+
+    url = f"https://api.mercadolibre.com/products/{catalogo_id}"
+
+    payload = {}
+    headers = {
+    'Authorization': 'Bearer APP_USR-7740131767656174-011210-65ca92db279766a1f3eb40016c312430-17228348'
+    }
+
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        try:
+            response3 = requests.request("GET", url, headers=headers, data=payload, timeout=10)
+            response3.raise_for_status()  # Lanzará una excepción si la solicitud no fue exitosa (código de estado diferente de 2xx)
+            catalago_id = response3.json()
+            ventas2 = catalago_id['sold_quantity']
+            break
+        except requests.exceptions.RequestException as e:
+            print(f"Intento {attempt + 1} fallido. Razón: {str(e)}")
+        if attempt < max_attempts - 1:
+            print("Reintentando en 5 segundos...")
+            time.sleep(1)  # Espera 5 segundos antes de intentar nuevamente
+        else:
+            # Inicializar el navegador
+            driver = webdriver.Chrome()
+
+            # Abrir la página web de busqeuda
+            driver.get(link)
+
+            elemento = driver.find_element(By.CLASS_NAME, 'ui-pdp-subtitle')
+            ventas2 = elemento.text
+            # Cerrar el controlador de Selenium
+            driver.quit()
+            print("Número máximo de intentos alcanzado. La solicitud no se pudo completar.")
+
+    
+    print(ventas2)
 
     # #Agregar los datos al Dataframe
     info_producto.append({
