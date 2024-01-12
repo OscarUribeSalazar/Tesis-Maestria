@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 
 # https://auth.mercadolibre.com.mx/authorization?response_type=code&client_id=7740131767656174&redirect_uri=https://reypi.com.br
-app = 'APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
+app = 'APP_USR-7740131767656174-011214-4ae87833e6552ccdac8b2f4a1da1ecce-17228348'
 
 ruta_productos = 'Productos MLM455214 - 2024-01-12_06-05-45.csv'
 df = pd.read_csv(ruta_productos)
@@ -19,7 +19,7 @@ nombre_archivo_reseña_csv = f"Reseñas_{timestamp}.csv"
 info_producto = []
 info_reseña = []
 
-for id_producto in df['ID'][:20]:
+for id_producto in df['ID'][50:200]:
     print(id_producto)
 
     limit = 100
@@ -29,7 +29,7 @@ for id_producto in df['ID'][:20]:
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011214-4ae87833e6552ccdac8b2f4a1da1ecce-17228348'
     }
 
     max_attempts = 3
