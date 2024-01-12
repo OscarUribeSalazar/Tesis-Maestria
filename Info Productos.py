@@ -1,11 +1,10 @@
 import pandas as pd
 import requests
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 import time
 from datetime import datetime
 
-id_producto = 'MLM1910972743'
+# https://auth.mercadolibre.com.mx/authorization?response_type=code&client_id=7740131767656174&redirect_uri=https://reypi.com.br
+app = 'APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
 
 ruta_productos = 'Productos MLM455214 - 2024-01-12_06-05-45.csv'
 df = pd.read_csv(ruta_productos)
@@ -18,20 +17,20 @@ nombre_archivo_csv = f"Info_Productos_{timestamp}.csv"
 
 info_producto = []
 
-for id_producto in df['ID'][:10]:
+for id_producto in df['ID'][15:20]:
     print(id_producto)
 
     url = f"https://api.mercadolibre.com/items/{id_producto}"
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011210-65ca92db279766a1f3eb40016c312430-17228348'
     }
 
     max_attempts = 3
     for attempt in range(max_attempts):
         try:
-            response1 = requests.request("GET", url, headers=headers, data=payload, timeout=10)
+            response1 = requests.request("GET", url, headers=headers, data=payload, timeout=50)
             response1.raise_for_status()  # Lanzará una excepción si la solicitud no fue exitosa (código de estado diferente de 2xx)
             data = response1.json()
             break
@@ -47,7 +46,7 @@ for id_producto in df['ID'][:10]:
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011210-65ca92db279766a1f3eb40016c312430-17228348'
     }
 
     max_attempts = 3
@@ -73,7 +72,7 @@ for id_producto in df['ID'][:10]:
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011210-65ca92db279766a1f3eb40016c312430-17228348'
     }
 
     max_attempts = 3
@@ -91,7 +90,9 @@ for id_producto in df['ID'][:10]:
         else:
             print("Número máximo de intentos alcanzado. La solicitud no se pudo completar.")
 
+    
     ventas2 = catalago_id['sold_quantity']
+    print(ventas2)
 
     id = data['id']
     title = data['title']
