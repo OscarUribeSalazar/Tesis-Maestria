@@ -30,7 +30,7 @@ for id_producto in df['ID'][200:1200]:
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011214-4ae87833e6552ccdac8b2f4a1da1ecce-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011416-708f26e3ac92b05ce5cc2b89e073de26-17228348'
     }
 
     max_attempts = 5
@@ -89,7 +89,7 @@ for id_producto in df['ID'][200:1200]:
     for j in range(0, num_reseñas, 100):
         offset_2 = j
         url = f"https://api.mercadolibre.com/reviews/item/{id_producto}?limit={limit}&offset={offset_2}"
-        max_attempts = 3
+        max_attempts = 5
         for attempt in range(max_attempts):
             try:
                 response = requests.request("GET", url, headers=headers, data=payload, timeout=10)
@@ -97,11 +97,12 @@ for id_producto in df['ID'][200:1200]:
                 data = response.json()
                 break
             except requests.exceptions.RequestException as e:
-                print(f"Intento {attempt + 1} fallido. Razón: {str(e)}")
+                print(f"Intento {attempt + 1} fallido. Razón: {str(e)} nuevo offset")
             if attempt < max_attempts - 1:
                 print("Reintentando en 5 segundos...")
                 time.sleep(5)  # Espera 5 segundos antes de intentar nuevamente
             else:
+                lista_errores.append({"Offset": id_producto})
                 print("Número máximo de intentos alcanzado. La solicitud no se pudo completar.")
 
         num_reseñas_revisar = len(data['reviews'])
