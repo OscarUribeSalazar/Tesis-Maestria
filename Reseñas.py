@@ -18,8 +18,9 @@ nombre_archivo_reseña_csv = f"Reseñas_{timestamp}.csv"
 
 info_producto = []
 info_reseña = []
+lista_errores =  []
 
-for id_producto in df['ID'][50:200]:
+for id_producto in df['ID'][200:1200]:
     print(id_producto)
 
     limit = 100
@@ -32,7 +33,7 @@ for id_producto in df['ID'][50:200]:
     'Authorization': 'Bearer APP_USR-7740131767656174-011214-4ae87833e6552ccdac8b2f4a1da1ecce-17228348'
     }
 
-    max_attempts = 3
+    max_attempts = 5
     for attempt in range(max_attempts):
         try:
             response = requests.request("GET", url, headers=headers, data=payload, timeout=10)
@@ -40,11 +41,12 @@ for id_producto in df['ID'][50:200]:
             data = response.json()
             break
         except requests.exceptions.RequestException as e:
-            print(f"Intento {attempt + 1} fallido. Razón: {str(e)}")
+            print(f"Intento {attempt + 1} fallido. Razón: {str(e)} obteniendo items")
         if attempt < max_attempts - 1:
             print("Reintentando en 5 segundos...")
             time.sleep(5)  # Espera 5 segundos antes de intentar nuevamente
         else:
+            lista_errores.append({"Items": id_producto})
             print("Número máximo de intentos alcanzado. La solicitud no se pudo completar.")
 
     num_reseñas = data['paging']['total']
@@ -156,4 +158,6 @@ info_reseña_df = pd.DataFrame(info_reseña)
 
 # Guardar los datos en un archivo CSV
 info_reseña_df.to_csv(nombre_archivo_reseña_csv, index=False)
+
+print(lista_errores)
 
