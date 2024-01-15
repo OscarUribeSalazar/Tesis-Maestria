@@ -4,7 +4,6 @@ import time
 from datetime import datetime
 
 # https://auth.mercadolibre.com.mx/authorization?response_type=code&client_id=7740131767656174&redirect_uri=https://reypi.com.br
-app = 'APP_USR-7740131767656174-011214-4ae87833e6552ccdac8b2f4a1da1ecce-17228348'
 
 ruta_productos = 'Productos MLM455214 - 2024-01-12_06-05-45.csv'
 df = pd.read_csv(ruta_productos)
@@ -20,7 +19,7 @@ info_producto = []
 info_reseña = []
 lista_errores =  []
 
-for id_producto in df['ID'][1200:]:
+for id_producto in df['ID']:
     print(id_producto)
 
     limit = 100
@@ -30,7 +29,7 @@ for id_producto in df['ID'][1200:]:
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011416-708f26e3ac92b05ce5cc2b89e073de26-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011515-6f612c03ec9c4dc13b8815d24a1bd892-17228348'
     }
 
     max_attempts = 5
@@ -55,8 +54,8 @@ for id_producto in df['ID'][1200:]:
     one = num_reseñas_calificacion['one_star']
     dos = num_reseñas_calificacion['two_star']
     tres = num_reseñas_calificacion['three_star']
-    cuatro = cero = num_reseñas_calificacion['four_star']
-    cinco = cero = num_reseñas_calificacion['five_star']
+    cuatro = num_reseñas_calificacion['four_star']
+    cinco = num_reseñas_calificacion['five_star']
 
     #Agregar los datos al Dataframe
     producto_info = {
