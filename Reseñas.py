@@ -20,7 +20,7 @@ info_producto = []
 info_reseña = []
 lista_errores =  []
 
-for id_producto in df['ID'][200:1200]:
+for id_producto in df['ID'][1200:]:
     print(id_producto)
 
     limit = 100
@@ -143,7 +143,8 @@ for id_producto in df['ID'][200:1200]:
                 'Reacciones': reacciones,
                 'atributos': atributos,
                 'Variación_Atributos': variacion_atributos
-            })  
+            })
+        time.sleep(1)  
 
 # Agregar el diccionario de info del producto a la lista
 info_producto.append(producto_info)

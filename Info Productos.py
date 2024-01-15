@@ -22,14 +22,14 @@ nombre_archivo_csv = f"Info_Productos_{timestamp}.csv"
 info_producto = []
 lista_errores =  []
 
-for id_producto in df['ID'][200:1200]:
+for id_producto in df['ID'][1200:2200]:
     print(id_producto)
 
     url = f"https://api.mercadolibre.com/items/{id_producto}"
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011218-56a113394e5da7773d2db48f9a98fbb6-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011416-708f26e3ac92b05ce5cc2b89e073de26-17228348'
     }
     max_attempts = 5
     for attempt in range(max_attempts):
@@ -51,7 +51,7 @@ for id_producto in df['ID'][200:1200]:
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011218-56a113394e5da7773d2db48f9a98fbb6-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011416-708f26e3ac92b05ce5cc2b89e073de26-17228348'
     }
 
     max_attempts = 5
@@ -60,6 +60,7 @@ for id_producto in df['ID'][200:1200]:
             response2 = requests.request("GET", url, headers=headers, data=payload, timeout=10)
             response2.raise_for_status()  # Lanzará una excepción si la solicitud no fue exitosa (código de estado diferente de 2xx)
             descripcion_json = response2.json()
+            descripcion = descripcion_json['plain_text']
             break
         except requests.exceptions.RequestException as e:
             print(f"Intento {attempt + 1} fallido. Razón: {str(e)} obteniendo descripción")
@@ -68,9 +69,8 @@ for id_producto in df['ID'][200:1200]:
             time.sleep(5)  # Espera 5 segundos antes de intentar nuevamente
         else:
             lista_errores.append({"Descripción": id_producto})
+            descripcion = 'NA'
             print("Número máximo de intentos obteniendo de Descripción. La solicitud no se pudo completar.")
-
-    descripcion = descripcion_json['plain_text']
 
     catalogo_id = data['catalog_product_id']
 
@@ -96,7 +96,7 @@ for id_producto in df['ID'][200:1200]:
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011218-56a113394e5da7773d2db48f9a98fbb6-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011416-708f26e3ac92b05ce5cc2b89e073de26-17228348'
     }
 
     max_attempts = 3
