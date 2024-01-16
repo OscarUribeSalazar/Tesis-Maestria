@@ -21,7 +21,7 @@ nombre_archivo_csv = f"Info_Productos_{timestamp}.csv"
 info_producto = []
 lista_errores =  []
 
-for id_producto in df['ID'][2200:2205]:
+for id_producto in df['ID'][2200:3200]:
     print(id_producto)
 
     url = f"https://api.mercadolibre.com/items/{id_producto}"
@@ -118,7 +118,6 @@ for id_producto in df['ID'][2200:2205]:
                         chrome_options = Options()
                         prefs = {"profile.managed_default_content_settings.images": 2}  # Esto deshabilita las imágenes
                         chrome_options.add_experimental_option("prefs", prefs)
-
                         # Inicia el navegador con las opciones configuradas
                         driver = webdriver.Chrome(options=chrome_options)
                         driver.get(link)
@@ -130,8 +129,8 @@ for id_producto in df['ID'][2200:2205]:
                     except NoSuchElementException as e:
                         print(f"Intento {attempts_nav + 1} fallido. Razón: {str(e)}")
                         if attempts_nav < max_attempts_nav - 1:
-                            print("Reintentando en 5 segundos...")
-                            time.sleep(5)
+                            print("Reintentando en 2 segundos...")
+                            time.sleep(2)
                         else:
                             lista_errores.append({"Descripción": id_producto})
                             ventas2 = 0
@@ -140,8 +139,8 @@ for id_producto in df['ID'][2200:2205]:
             else:
                 print(f"Intento {attempt + 1} fallido. Razón: {str(e)} obteniendo ventas")
                 if attempt < max_attempts - 1:
-                    print("Reintentando en 5 segundos...")
-                    time.sleep(5)
+                    print("Reintentando en 2 segundos...")
+                    time.sleep(2)
                 else:
                     lista_errores.append({"Descripción": id_producto})
                     ventas2 = 0
