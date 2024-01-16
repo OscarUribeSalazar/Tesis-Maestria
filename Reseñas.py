@@ -19,7 +19,7 @@ info_producto = []
 info_reseña = []
 lista_errores =  []
 
-for id_producto in df['ID']:
+for id_producto in df['ID'][:30]:
     print(id_producto)
 
     limit = 100
@@ -48,14 +48,14 @@ for id_producto in df['ID']:
             lista_errores.append({"Items": id_producto})
             print("Número máximo de intentos alcanzado. La solicitud no se pudo completar.")
 
-    num_reseñas = data['paging']['total']
-    promedio_reseñas = data['rating_average']
-    num_reseñas_calificacion = data['rating_levels']
-    one = num_reseñas_calificacion['one_star']
-    dos = num_reseñas_calificacion['two_star']
-    tres = num_reseñas_calificacion['three_star']
-    cuatro = num_reseñas_calificacion['four_star']
-    cinco = num_reseñas_calificacion['five_star']
+    num_reseñas = data.get('paging', {}).get('total', None)
+    promedio_reseñas = data.get('rating_average', None)
+    num_reseñas_calificacion = data.get('rating_levels', None)
+    one = num_reseñas_calificacion.get('one_star', None)
+    dos = num_reseñas_calificacion.get('two_star', None)
+    tres = num_reseñas_calificacion.get('three_star', None)
+    cuatro = num_reseñas_calificacion.get('four_star', None)
+    cinco = num_reseñas_calificacion.get('five_star', None)
 
     #Agregar los datos al Dataframe
     producto_info = {
@@ -111,20 +111,20 @@ for id_producto in df['ID']:
 
         for i in range(num_reseñas_revisar):
             reseña = data['reviews'][i]
-            id = reseña['id']
-            fecha_creacion = reseña['date_created']
-            contenido = reseña['content']
-            valoracion = reseña['rate']
-            rate = reseña['valorization']
-            likes = reseña['likes']
-            dislikes = reseña['dislikes']
-            fecha_compra = reseña['buying_date']
-            num_palabras = reseña['relevance']
-            palabras_prohibidas = reseña['forbidden_words']
-            atributos = reseña['attributes']
-            media = len(reseña['media'])
-            reacciones = reseña['reactions']
-            variacion_atributos = reseña['attributes_variation']
+            id = reseña.get('id', None)
+            fecha_creacion = reseña.get('date_created', None)
+            contenido = reseña.get('content', None)
+            valoracion = reseña.get('rate', None)
+            rate = reseña.get('valorization', None)
+            likes = reseña.get('likes', None)
+            dislikes = reseña.get('dislikes', None)
+            fecha_compra = reseña.get('buying_date', None)
+            num_palabras = reseña.get('relevance', None)
+            palabras_prohibidas = reseña.get('forbidden_words', None)
+            atributos = reseña.get('attributes', None)
+            media = len(reseña.get('media', []))  # default to an empty list if 'media' is not present
+            reacciones = reseña.get('reactions', None)
+            variacion_atributos = reseña.get('attributes_variation', None)
 
             #Agregar los datos al Dataframe
             info_reseña.append({

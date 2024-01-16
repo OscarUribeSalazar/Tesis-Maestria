@@ -5,10 +5,9 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
-
+from selenium.webdriver.chrome.options import Options
 
 # https://auth.mercadolibre.com.mx/authorization?response_type=code&client_id=7740131767656174&redirect_uri=https://reypi.com.br
-app = 'APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
 
 ruta_productos = 'Productos MLM455214 - 2024-01-12_06-05-45.csv'
 df = pd.read_csv(ruta_productos)
@@ -22,19 +21,19 @@ nombre_archivo_csv = f"Info_Productos_{timestamp}.csv"
 info_producto = []
 lista_errores =  []
 
-for id_producto in df['ID'][1200:2200]:
+for id_producto in df['ID'][2200:2205]:
     print(id_producto)
 
     url = f"https://api.mercadolibre.com/items/{id_producto}"
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011416-708f26e3ac92b05ce5cc2b89e073de26-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011515-6f612c03ec9c4dc13b8815d24a1bd892-17228348'
     }
     max_attempts = 5
     for attempt in range(max_attempts):
         try:
-            response1 = requests.request("GET", url, headers=headers, data=payload, timeout=50)
+            response1 = requests.request("GET", url, headers=headers, data=payload, timeout=10)
             response1.raise_for_status()  # Lanzará una excepción si la solicitud no fue exitosa (código de estado diferente de 2xx)
             data = response1.json()
             break
@@ -51,7 +50,7 @@ for id_producto in df['ID'][1200:2200]:
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011416-708f26e3ac92b05ce5cc2b89e073de26-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011515-6f612c03ec9c4dc13b8815d24a1bd892-17228348'
     }
 
     max_attempts = 5
@@ -69,34 +68,35 @@ for id_producto in df['ID'][1200:2200]:
             time.sleep(5)  # Espera 5 segundos antes de intentar nuevamente
         else:
             lista_errores.append({"Descripción": id_producto})
-            descripcion = 'NA'
+            descripcion = None
             print("Número máximo de intentos obteniendo de Descripción. La solicitud no se pudo completar.")
-
-    catalogo_id = data['catalog_product_id']
-
-    id = data['id']
-    title = data['title']
-    seller_id = data['seller_id']
-    precio = data['price']
-    inventario_inicial = data['initial_quantity']
-    link = data['permalink']
-    fecha_creacion = data['date_created']
-    ultima_actializacion = data['last_updated']
-    atributos = data['attributes']
-    categoria = data['category_id']
+    catalogo_id = data.get('catalog_product_id', None)
+    id = data.get('id', None)
+    title = data.get('title', None)
+    seller_id = data.get('seller_id', None)
+    precio = data.get('price', None)
+    inventario_inicial = data.get('initial_quantity', None)
+    link = data.get('permalink', None)
+    fecha_creacion = data.get('date_created', None)
+    ultima_actualizacion = data.get('last_updated', None)
+    atributos = data.get('attributes', [])
+    categoria = data.get('category_id', None)
+    salud = data.get('health', None)
+      
     lista_atributos = []
     for i in range(len(atributos)):
         atributo = atributos[i]
-        name = atributo['name']
-        value_name = atributo['value_name']
-        lista_atributos.append({"":[name, value_name]})
-    salud = data['health']
+        name = atributo.get('name', None)
+        value_name = atributo.get('value_name', None)
+        lista_atributos.append({"": [name, value_name]})
+
+    
 
     url = f"https://api.mercadolibre.com/products/{catalogo_id}"
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011416-708f26e3ac92b05ce5cc2b89e073de26-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011515-6f612c03ec9c4dc13b8815d24a1bd892-17228348'
     }
 
     max_attempts = 3
@@ -110,12 +110,17 @@ for id_producto in df['ID'][1200:2200]:
         except requests.exceptions.RequestException as e:
             if "Not Found for url: https://api.mercadolibre.com/products/None" in str(e):
                 print("URL no encontrada. Saltando a Selenium...")
-                max_attempts_nav = 2
+                max_attempts_nav = 3
                 for attempts_nav in range(max_attempts_nav):
                     try:
-                        # Inicializar el navegador
-                        driver = webdriver.Chrome()
                         # Abrir la página web de búsqueda
+                        # Configura las opciones de Chrome
+                        chrome_options = Options()
+                        prefs = {"profile.managed_default_content_settings.images": 2}  # Esto deshabilita las imágenes
+                        chrome_options.add_experimental_option("prefs", prefs)
+
+                        # Inicia el navegador con las opciones configuradas
+                        driver = webdriver.Chrome(options=chrome_options)
                         driver.get(link)
                         elemento = driver.find_element(By.CLASS_NAME, 'ui-pdp-subtitle')
                         ventas2 = elemento.text
@@ -153,7 +158,7 @@ for id_producto in df['ID'][1200:2200]:
         'Inventario_Inicial': inventario_inicial,
         'link': link,
         'Fecha de Creacion': fecha_creacion,
-        'Ultima_Actualizacion': ultima_actializacion,
+        'Ultima_Actualizacion': ultima_actualizacion,
         'Salud': salud,
         'Categoria': categoria,
         'Ventas': ventas2,
