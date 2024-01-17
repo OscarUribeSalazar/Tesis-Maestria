@@ -21,14 +21,13 @@ nombre_archivo_csv = f"Info_Productos_{timestamp}.csv"
 info_producto = []
 lista_errores =  []
 
-for id_producto in df['ID'][2200:3200]:
+for id_producto in df['ID'][2700:3200]:
     print(id_producto)
-
     url = f"https://api.mercadolibre.com/items/{id_producto}"
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011515-6f612c03ec9c4dc13b8815d24a1bd892-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011610-434f9b6a20de8102cb96f4b8b80f71db-17228348'
     }
     max_attempts = 5
     for attempt in range(max_attempts):
@@ -36,6 +35,7 @@ for id_producto in df['ID'][2200:3200]:
             response1 = requests.request("GET", url, headers=headers, data=payload, timeout=10)
             response1.raise_for_status()  # Lanzará una excepción si la solicitud no fue exitosa (código de estado diferente de 2xx)
             data = response1.json()
+            print('OK')
             break
         except requests.exceptions.RequestException as e:
             print(f"Intento {attempt + 1} fallido. Razón: {str(e)} obteniendo items")
@@ -50,7 +50,7 @@ for id_producto in df['ID'][2200:3200]:
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011515-6f612c03ec9c4dc13b8815d24a1bd892-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011610-434f9b6a20de8102cb96f4b8b80f71db-17228348'
     }
 
     max_attempts = 5
@@ -60,6 +60,7 @@ for id_producto in df['ID'][2200:3200]:
             response2.raise_for_status()  # Lanzará una excepción si la solicitud no fue exitosa (código de estado diferente de 2xx)
             descripcion_json = response2.json()
             descripcion = descripcion_json['plain_text']
+            print('OK')
             break
         except requests.exceptions.RequestException as e:
             print(f"Intento {attempt + 1} fallido. Razón: {str(e)} obteniendo descripción")
@@ -96,9 +97,9 @@ for id_producto in df['ID'][2200:3200]:
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011515-6f612c03ec9c4dc13b8815d24a1bd892-17228348'
+    'Authorization': 'Bearer APP_USR-7740131767656174-011610-434f9b6a20de8102cb96f4b8b80f71db-17228348'
     }
-
+    print(link)
     max_attempts = 3
     for attempt in range(max_attempts):
         try:
@@ -108,7 +109,7 @@ for id_producto in df['ID'][2200:3200]:
             ventas2 = catalago_id['sold_quantity']
             break
         except requests.exceptions.RequestException as e:
-            if "Not Found for url: https://api.mercadolibre.com/products/None" in str(e):
+            if isinstance(e, Exception) and "Not Found for url: https://api.mercadolibre.com/products/None" in str(e) and link is not None:
                 print("URL no encontrada. Saltando a Selenium...")
                 max_attempts_nav = 3
                 for attempts_nav in range(max_attempts_nav):
@@ -121,8 +122,10 @@ for id_producto in df['ID'][2200:3200]:
                         # Inicia el navegador con las opciones configuradas
                         driver = webdriver.Chrome(options=chrome_options)
                         driver.get(link)
+                        time.sleep(5)
                         elemento = driver.find_element(By.CLASS_NAME, 'ui-pdp-subtitle')
                         ventas2 = elemento.text
+                        print('OK')
                         # Cerrar el controlador de Selenium
                         driver.quit()
                         break
@@ -132,19 +135,20 @@ for id_producto in df['ID'][2200:3200]:
                             print("Reintentando en 2 segundos...")
                             time.sleep(2)
                         else:
-                            lista_errores.append({"Descripción": id_producto})
+                            lista_errores.append({"Ventas Web": id_producto})
                             ventas2 = 0
                             print("Número máximo de intentos alcanzado. La solicitud no se pudo completar.")
-                break
+                    break
             else:
                 print(f"Intento {attempt + 1} fallido. Razón: {str(e)} obteniendo ventas")
                 if attempt < max_attempts - 1:
                     print("Reintentando en 2 segundos...")
                     time.sleep(2)
                 else:
-                    lista_errores.append({"Descripción": id_producto})
+                    lista_errores.append({"Ventas API": id_producto})
                     ventas2 = 0
                     print("Número máximo de intentos alcanzado obteniendo ventas. La solicitud no se pudo completar.")
+
     
     print(ventas2)
 
