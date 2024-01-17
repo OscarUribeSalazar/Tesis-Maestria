@@ -21,7 +21,7 @@ nombre_archivo_csv = f"Info_Productos_{timestamp}.csv"
 info_producto = []
 lista_errores =  []
 
-for id_producto in df['ID'][2700:3200]:
+for id_producto in df['ID'][3200:]:
     print(id_producto)
     url = f"https://api.mercadolibre.com/items/{id_producto}"
 
