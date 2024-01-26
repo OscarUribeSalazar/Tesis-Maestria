@@ -4,9 +4,8 @@ import time
 from datetime import datetime
 
 # https://auth.mercadolibre.com.mx/authorization?response_type=code&client_id=7740131767656174&redirect_uri=https://reypi.com.br
-app = 'APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
-
-id_categoria = 'MLM455214'
+app = 'Bearer APP_USR-7740131767656174-012310-73f5c85d8344358ddefb8a4537265c3a-17228348'
+id_categoria = 'MLM191825'
 
 # Obtener la fecha y hora actual para guardar el dataframe con la fecha que se extrajo
 now = datetime.now()
@@ -20,7 +19,7 @@ url = f"https://api.mercadolibre.com/sites/MLM/search?limit={limit}&category={id
 
 payload = {}
 headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011208-4f929ce1b04eba6437746f2924f50fce-17228348'
+    'Authorization': app
 }
 
 response = requests.request("GET", url, headers=headers, data=payload, timeout=50)
@@ -31,8 +30,9 @@ info_categoria = []
 
 for j in range(0, num_resultados, 50):
     offset_3 = j
+    print(offset_3)
     url = f"https://api.mercadolibre.com/sites/MLM/search?limit={limit}&category={id_categoria}&offset={offset_3}"
-    max_attempts = 3
+    max_attempts = 10
     for attempt in range(max_attempts):
         try:
             response = requests.request("GET", url, headers=headers, data=payload, timeout=50)

@@ -4,22 +4,24 @@ import time
 from datetime import datetime
 
 # https://auth.mercadolibre.com.mx/authorization?response_type=code&client_id=7740131767656174&redirect_uri=https://reypi.com.br
-
-ruta_productos = 'Productos MLM455214 - 2024-01-12_06-05-45.csv'
+app = 'Bearer APP_USR-7740131767656174-012310-73f5c85d8344358ddefb8a4537265c3a-17228348'
+id_categoria = 'MLM191825'
+ruta_productos = 'Productos MLM191825 - 2024-01-23_08-03-09.csv'
 df = pd.read_csv(ruta_productos)
 
 # Obtener la fecha y hora actual para guardar el dataframe con la fecha que se extrajo
 now = datetime.now()
+
 timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")
 # Crear el nombre del archivo información
-nombre_archivo_inforeseñas_csv = f"Info_reseñas_{timestamp}.csv"
-nombre_archivo_reseña_csv = f"Reseñas_{timestamp}.csv"
+nombre_archivo_inforeseñas_csv = f"Info_reseñas_{id_categoria}_{timestamp}.csv"
+nombre_archivo_reseña_csv = f"Reseñas_{id_categoria}_{timestamp}.csv"
 
 info_producto = []
 info_reseña = []
 lista_errores =  []
 
-for id_producto in df['ID'][:30]:
+for id_producto in df['ID']:
     print(id_producto)
 
     limit = 100
@@ -29,7 +31,7 @@ for id_producto in df['ID'][:30]:
 
     payload = {}
     headers = {
-    'Authorization': 'Bearer APP_USR-7740131767656174-011515-6f612c03ec9c4dc13b8815d24a1bd892-17228348'
+    'Authorization': app
     }
 
     max_attempts = 5
@@ -159,6 +161,13 @@ info_reseña_df = pd.DataFrame(info_reseña)
 
 # Guardar los datos en un archivo CSV
 info_reseña_df.to_csv(nombre_archivo_reseña_csv, index=False)
+
+# Obtener la fecha y hora actual para guardar el dataframe con la fecha que se extrajo
+end = datetime.now()
+
+time_pro = end - now
+
+print(time_pro)
 
 print(lista_errores)
 
